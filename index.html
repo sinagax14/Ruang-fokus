@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827"><link rel="manifest" href="manifest.json"><title>Ruang Fokus</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font:16px system-ui;background:#101827;color:#f5f7fb;padding:22px;max-width:720px;margin:auto}h1{margin:8px 0}p{color:#aeb9ca}.panel{background:#1b2739;border:1px solid #34435a;border-radius:16px;padding:16px;margin:16px 0}input,button{font:inherit;border-radius:10px;padding:12px;border:1px solid #465873}input{width:100%;background:#101827;color:white;margin:8px 0}button{background:#7c9cff;color:#101827;font-weight:700;cursor:pointer}ul{padding:0;list-style:none}li{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #34435a}li span{flex:1;overflow-wrap:anywhere}.done{text-decoration:line-through;color:#8996a9}.del{background:#39485f;color:white;padding:7px 10px}.muted{font-size:13px;color:#9eacc0}</style>
+</head><body>
+<h1>Ruang Fokus</h1><p>Atur aktivitasmu. Satu langkah kecil setiap hari.</p>
+<section class="panel"><h2>Tambah agenda</h2><form id="form"><input id="task" placeholder="Contoh: belajar 30 menit" required><button type="submit">Tambah aktivitas</button></form></section>
+<section class="panel"><h2>Agenda hari ini</h2><p id="count" class="muted">0 aktivitas</p><ul id="list"></ul></section>
+<section class="panel"><h2>Catatan harian</h2><textarea id="note" rows="4" style="width:100%;background:#101827;color:white;border:1px solid #465873;border-radius:10px;padding:12px" placeholder="Tulis hal penting hari ini..."></textarea><p><button id="saveNote" type="button">Simpan catatan</button> <span id="saved" class="muted"></span></p></section>
+<script>
+const $=id=>document.getElementById(id);let tasks=JSON.parse(localStorage.getItem('rf_tasks')||'[]');
+function save(){localStorage.setItem('rf_tasks',JSON.stringify(tasks));render()}
+function render(){$('list').innerHTML='';tasks.forEach((t,i)=>{const li=document.createElement('li'),cb=document.createElement('input');cb.type='checkbox';cb.checked=t.done;cb.style.width='auto';cb.addEventListener('change',()=>{tasks[i].done=cb.checked;save()});const s=document.createElement('span');s.textContent=t.text;s.className=t.done?'done':'';const b=document.createElement('button');b.textContent='Hapus';b.className='del';b.addEventListener('click',()=>{tasks.splice(i,1);save()});li.append(cb,s,b);$('list').append(li)});$('count').textContent=`${tasks.length} aktivitas · ${tasks.filter(t=>t.done).length} selesai`}
+$('form').addEventListener('submit',e=>{e.preventDefault();const v=$('task').value.trim();if(!v)return;tasks.push({text:v,done:false});$('task').value='';save()});$('note').value=localStorage.getItem('rf_note')||'';$('saveNote').addEventListener('click',()=>{localStorage.setItem('rf_note',$('note').value);$('saved').textContent='Tersimpan'});render();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script></body></html>
